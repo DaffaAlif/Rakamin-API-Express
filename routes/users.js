@@ -1,6 +1,10 @@
 let express = require("express");
 let router = express.Router();
+let bcrypt = require("bcryptjs")
 let validator = require("../validators");
+
+const authenticateToken = require('../middleware/authenticateToken')
+
 const {
   getAllUsers,
   getUserById,
@@ -10,7 +14,7 @@ const {
 } = require("../models/userModels");
 
 /* GET users listing. */
-router.get("/", async (req, res) => {
+router.get("/", authenticateToken, async (req, res) => {
   try {
     const result = await getAllUsers();
     res.json(result);
@@ -36,7 +40,7 @@ router.get("/:id", async (req, res) => {
 
 // Create a new user
 router.post("/", async (req, res) => {
-  const { name, email, no_rek, no_hp } = req.body;
+  const { name, email, no_rek, no_hp, password } = req.body;
 
   const { error } = validator.userSchema.validate(req.body);
 
@@ -47,8 +51,10 @@ router.post("/", async (req, res) => {
     return;
   }
 
+  const hashedPassword = await bcrypt.hash(password, 10)
+
   try {
-    const result = await createUser(name, email, no_rek, no_hp);
+    const result = await createUser(name, email, no_rek, no_hp, hashedPassword);
     res.status(201).json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
