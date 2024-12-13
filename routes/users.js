@@ -23,6 +23,19 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
+
+//GET current users
+router.get("/current", authenticateToken, async (req, res) => {
+
+  const user = req.user
+  try {
+    const result = await getUserById(user.id);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Get user by ID
 router.get("/:id", async (req, res) => {
   const userId = parseInt(req.params.id);

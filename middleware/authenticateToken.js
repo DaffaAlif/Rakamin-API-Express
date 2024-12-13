@@ -5,9 +5,6 @@ const authenticateToken = (req, res, next) => {
   const token = req.headers["authorization"];
   const NODE_ENV = process.env.NODE_ENV;
 
-  console.log(NODE_ENV)
-
-
   if (!token) {
     return res.status(403).json("You are not Authenticated");
   }
@@ -18,5 +15,6 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
+
 
 module.exports = authenticateToken
